@@ -1,0 +1,52 @@
+{% extends(":default:inside_index.html.twig") %}
+{% set pageName = "Użytkownicy" %}
+{% block contestClassMenu %}active{% endblock %}
+{% block activeContestsClassMenu %}active{% endblock %}
+{% block main %}
+    {{ parent() }}
+    <div class="row company-contests-page">
+        <div class="col-xs-12 col-sm-6">
+            <div class="box">
+                {{ form_start(edit_form) }}
+                <div class="box-header">
+                    <h3 class="box-title">
+                        Edycja użytkownika
+                    </h3>
+                </div>
+                <div class="box-body">
+                    {{ form_row(edit_form.email, {'label': "Adres e-mail" }) }}
+                    <div style="margin-left: 25px">
+                        {{ form_row(edit_form.isActive, {'label': "Aktywny" }) }}
+                    </div>
+                    {% if edit_form.runner is defined %}
+                        {{ form_row(edit_form.runner.name, {'label': "Imię" }) }}
+                        {{ form_row(edit_form.runner.surname, {'label': "Nazwisko" }) }}
+                        {{ form_row(edit_form.runner.phone, {'label': "Numer telefonu" }) }}
+                        <div style="margin-left: 25px">
+                            {{ form_row(edit_form.runner.gender, {'label': "Płeć" }) }}
+                        </div>
+                        {{ form_row(edit_form.runner.birthDate, {'label': "Data urodzenia" }) }}
+                        {{ form_row(edit_form.runner.club, {'label': "Klub" }) }}
+                        {{ form_row(edit_form.runner.nationality, {'label': "Kraj" }) }}
+                    {% endif %}
+                    {% if edit_form.company is defined %}
+                        {{ form_row(edit_form.company.name, {'label': "Nazwa" }) }}
+                        {{ form_row(edit_form.company.city, {'label': "Miasto" }) }}
+                        {{ form_row(edit_form.company.nip, {'label': "Nip" }) }}
+                        {{ form_row(edit_form.company.postCode, {'label': "Kod pocztowy" }) }}
+                        {{ form_row(edit_form.company.street, {'label': "Ulica" }) }}
+                        {{ form_row(edit_form.company.phone, {'label': "Telefon" }) }}
+                        {{ form_row(edit_form.company.country, {'label': "Kraj" }) }}
+                    {% endif %}
+                </div>
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-info pull-right">Zapisz zmiany</button>
+                </div>
+                {{ form_end(edit_form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block stylesheet %}
+    <link rel="stylesheet" href="/template/plugins/datatables/dataTables.bootstrap.css">
+{% endblock %}

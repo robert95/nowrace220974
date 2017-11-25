@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Raceruns list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Lat</th>
+                <th>Lng</th>
+                <th>Time</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for raceRun in raceRuns %}
+            <tr>
+                <td><a href="{{ path('racerun_show', { 'id': raceRun.id }) }}">{{ raceRun.id }}</a></td>
+                <td>{{ raceRun.lat }}</td>
+                <td>{{ raceRun.lng }}</td>
+                <td>{% if raceRun.time %}{{ raceRun.time|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('racerun_show', { 'id': raceRun.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('racerun_edit', { 'id': raceRun.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('racerun_new') }}">Create a new raceRun</a>
+        </li>
+    </ul>
+{% endblock %}

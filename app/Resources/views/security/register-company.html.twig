@@ -1,0 +1,21 @@
+{% extends ':default:login_base.html.twig' %}
+{% block body %}
+    <div class="login-page">
+        <div class="form">
+            <h3>Rejestracja - <span>organizator</span></h3>
+            {{ form_start(form, {'attr': {'class': 'login-form', 'novalidate': 'novalidate'}}) }}
+            {{ form_row(form.user.email, {'label': "Adres email" }) }}
+            {{ form_row(form.user.plainPassword) }}
+            {{ form_row(form.name, {'label': "Nazwa" }) }}
+            {{ form_row(form.city, {'label': "Miasto" }) }}
+            {{ form_row(form.nip, {'label': "Nip" }) }}
+            {{ form_row(form.postCode, {'label': "Kod pocztowy" }) }}
+            {{ form_row(form.street, {'label': "Ulica" }) }}
+            {{ form_row(form.phone, {'label': "Telefon" }) }}
+            {{ form_row(form.country, {'label': "Kraj" }) }}
+            <button type="submit">Zarejestruj!</button>
+            <p class="message">Masz już konto? <a href="{{ path('security_login') }}">Zaloguj się</a></p>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

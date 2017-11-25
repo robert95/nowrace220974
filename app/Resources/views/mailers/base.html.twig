@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+</head>
+<body>
+<div style="background-color: #f3f3f3; overflow: hidden">
+    <div style="width:600px;margin:30px auto;max-width:100%;font-family:Arial,sans-serif;">
+        <table cellpadding="0" cellspacing="0" border="0" style="margin:auto;width:100%;background:white;font-family:Arial,sans-serif;border:1px solid #d4d4d4;border-radius:3px">
+            <tbody><tr>
+                <td style="vertical-align:top">
+                    <table cellpadding="0" cellspacing="0" border="0" style="width:76.66%;margin:45px 11.67% 55px">
+                        <tbody><tr>
+                            <td style="border-bottom: 1px solid black;font-size: 39px;font-weight: normal;padding-bottom: 26px;line-height:0">
+                                <a href="">NowRace.pl</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="line-height:0">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color:#32373a;vertical-align:top">
+                                {% block body %}{% endblock %}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div style="padding: 10px; font-family:Arial,sans-serif;font-size:12px;line-height:18px;color:#838789">
+            {% block footer %}{% endblock %}
+        </div>
+    </div>
+</div>
+</body>
+</html>

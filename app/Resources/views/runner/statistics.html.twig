@@ -1,0 +1,85 @@
+{% extends(":default:inside_index.html.twig") %}
+{% set pageName = "statystyki" %}
+{% block statisticClassMenu %}active{% endblock %}
+{% block stylesheet %}
+    <link rel="stylesheet" href="{{ asset('template/plugins/morris/morris.css') }}">
+{% endblock %}
+{% block main %}
+    {% set runner = app.user.runner %}
+    <div class="row">
+        <div class="col-sm-12">
+            {% if runner.endedRaces | length > 0 %}
+                <h2>Biegi w których brałeś udział - analiza odcinkowa</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <p class="">Wprowadź długość odcinka</p>
+                        <div class="input-group">
+                            <input class="form-control" type="text" placeholder="Długość odcinka w metrach np: 500" id="granulation">
+                            <span class="input-group-btn">
+                                    <button type="button" class="btn btn-info btn-flat" id="change-granulation">Akceptuj</button>
+                            </span>
+                        </div>
+                        <br>
+                    </div>
+                </div>
+                {% for raceData in raceRunnersData %}
+                    {% set race = raceData.raceRunner.race %}
+                        <div class="box box-success">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">{{ race.name }}</h3>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="box-body" style="">
+                                <div id="run_{{ raceData.raceRunner.race.id }}" style="height: 250px;"></div>
+                            </div>
+                        </div>
+                {% endfor %}
+            {% else %}
+                <div class="nr-empty-block" style="font-size: 20px;">
+                    Przykro nam, nie brałeś jeszcze udziału w żadnym biegu:(<br>
+                    Chcesz wziać udział w zawodach?<br>Tutaj znajdziesz
+                    <a class="btn btn-success btn-xs" href="{{ path('active_contests') }}">listę dostępnych zawodów</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script src="{{ asset('template/plugins/morris/raphael.min.js') }}"></script>
+    <script src="{{ asset('template/plugins/morris/morris.min.js') }}"></script>
+    <script>
+        {% for raceData in raceRunnersData %}
+            new Morris.Line({
+                // ID of the element in which to draw the chart.
+                element: 'run_{{ raceData.raceRunner.race.id }}',
+                // Chart data records -- each entry in this array corresponds to a point on
+                // the chart.
+                data: [
+                    {% for point in raceData.data %}
+                        { meters: '{{ point.meters }}m', speed: {{ point.speed }} }
+                        {% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                xkey: 'meters',
+                ykeys: ['speed'],
+                labels: ['Prędkość'],
+                parseTime: false,
+                postUnits: ' km/h'
+            });
+        {% endfor %}
+        $(document).ready(function () {
+            $("#change-granulation").click(function () {
+                var value = $("#granulation").val();
+                if(value >= 50 && value <= 10000){
+                    var url = '{{ path('runner_statistics') }}' + '/' + value;
+                    window.location = url;
+                }else{
+                    alert("Wprowadź wartość z zakesu 50-10000 metrów!");
+                }
+            });
+        });
+    </script>
+{% endblock %}

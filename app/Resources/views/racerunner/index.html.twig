@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Racerunners list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Startnumber</th>
+                <th>Finishplace</th>
+                <th>Starttime</th>
+                <th>Endtime</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for raceRunner in raceRunners %}
+            <tr>
+                <td><a href="{{ path('racerunner_show', { 'id': raceRunner.id }) }}">{{ raceRunner.id }}</a></td>
+                <td>{{ raceRunner.startNumber }}</td>
+                <td>{{ raceRunner.finishPlace }}</td>
+                <td>{% if raceRunner.startTime %}{{ raceRunner.startTime|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if raceRunner.endTime %}{{ raceRunner.endTime|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('racerunner_show', { 'id': raceRunner.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('racerunner_edit', { 'id': raceRunner.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('racerunner_new') }}">Create a new raceRunner</a>
+        </li>
+    </ul>
+{% endblock %}

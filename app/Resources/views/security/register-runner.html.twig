@@ -1,0 +1,21 @@
+{% extends ':default:login_base.html.twig' %}
+{% block body %}
+    <div class="login-page">
+        <div class="form">
+            <h3>Rejestracja - <span>zawodnik</span></h3>
+            {{ form_start(form, {'attr': {'class': 'login-form', 'novalidate': 'novalidate'}}) }}
+                {{ form_row(form.user.email, {'label': "Adres email" }) }}
+                {{ form_row(form.user.plainPassword) }}
+                {{ form_row(form.name, {'label': "Imię" }) }}
+                {{ form_row(form.surname, {'label': "Nazwisko" }) }}
+                {{ form_row(form.phone, {'label': "Numer telefonu" }) }}
+                {{ form_row(form.gender, {'label': "Płeć" }) }}
+                {{ form_row(form.birthDate, {'label': "Data urodzenia" }) }}
+                {{ form_row(form.club, {'label': "Klub" }) }}
+                {{ form_row(form.nationality, {'label': "Kraj" }) }}
+                <button type="submit">Zarejestruj!</button>
+                <p class="message">Masz już konto? <a href="{{ path('security_login') }}">Zaloguj się</a></p>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

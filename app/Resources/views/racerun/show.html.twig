@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Racerun</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ raceRun.id }}</td>
+            </tr>
+            <tr>
+                <th>Lat</th>
+                <td>{{ raceRun.lat }}</td>
+            </tr>
+            <tr>
+                <th>Lng</th>
+                <td>{{ raceRun.lng }}</td>
+            </tr>
+            <tr>
+                <th>Time</th>
+                <td>{% if raceRun.time %}{{ raceRun.time|date('Y-m-d H:i:s') }}{% endif %}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('racerun_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('racerun_edit', { 'id': raceRun.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

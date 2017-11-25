@@ -1,0 +1,21 @@
+{% extends ':default:login_base.html.twig' %}
+{% block body %}
+    {{ parent() }}
+    <div class="login-page">
+        <div class="form">
+            <h3>Logowanie</h3>
+            <form name="login" method="post" class="login-form" novalidate="novalidate">
+                <div class="form-group  "><label class="control-label required" for="login__username">Adres email</label><input id="login__username" name="_username" required="required" autocomplete="off" class="form-control" type="email" value="{{ last_username }}"></div>
+                <div class="form-group  "><label class="control-label required" for="login__password">Hasło</label><input id="login__password" name="_password" required="required" autocomplete="off" class="form-control" type="password"></div>
+                <button type="submit">Zaloguj się!</button>
+                <p class="message">Nie masz konta?<br>
+                    <a href="/register-runner">Zajestruj się jako zawodnik</a><br>
+                    <a href="/register-company">Zajestruj się jako organizator</a>
+                </p>
+                <p class="message">Nie pamiętasz hasła?
+                    <a href="/reset-password">Przypomnij hasło</a>
+                </p>
+            </form>
+        </div>
+    </div>
+{% endblock %}

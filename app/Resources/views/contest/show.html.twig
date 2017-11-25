@@ -1,0 +1,191 @@
+{% extends(":default:inside_index.html.twig") %}
+{% set pageName = contest.name %}
+{% block contestClassMenu %}active{% endblock %}
+{% set company = contest.company %}
+{% block main %}
+    {{ parent() }}
+    <section class="content">
+        <div class="row">
+            <div class="col-md-3">
+                <!-- About Me Box -->
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><strong>{{ contest.name }}</strong></h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <strong><i class="fa fa-map-marker margin-r-5"></i> Lokalizacja</strong>
+                        <p class="text-muted">{{ contest.adress }}</p>
+                        <hr>
+
+                        <strong><i class="fa fa-phone margin-r-5"></i> Telefon</strong>
+                        <p class="text-muted">{{ company.phone }}</p>
+                        <hr>
+
+                        <strong><i class="fa fa-internet-explorer margin-r-5"></i> WWW</strong>
+                        <p class="text-muted"><a href="http://{{ contest.www }}">{{ contest.www }}</a></p>
+                        <hr>
+
+                        <strong><i class="fa fa-file-text-o margin-r-5"></i> Notatka</strong>
+                        <p>{{ contest.notice }}</p>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+                <div class="box box-primary">
+                    <div class="box-body box-profile">
+                        <h3 class="profile-username text-center">{{ company.name }}</h3>
+                        <p class="text-muted text-center">Organizator</p>
+                        <ul class="list-group list-group-unbordered">
+                            <li class="list-group-item">
+                                <b>Zawody</b> <p class="pull-right">{{ company.contests | length }}</p>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Miasto</b> <p class="pull-right">{{ company.city }}</p>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Zarejestrowany</b> <p class="pull-right">{{ company.user.createdAt | date("d.m.Y") }}</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- /.col -->
+            <div class="col-md-9">
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#place" data-toggle="tab" aria-expanded="false">Miejsce</a></li>
+                        <li class=""><a href="#timeline" data-toggle="tab" aria-expanded="true">Plan</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="place">
+                            <div id="map" style="width:100%; height: 600px;">
+                            </div>
+                        </div>
+                        <!-- /.tab-pane -->
+                            {% set actualDate = null %}
+                            {% if contest.races | length > 0 %}
+                                <div class="tab-pane" id="timeline">
+                                    <!-- The timeline -->
+                                    <ul class="timeline timeline-inverse">
+                                    {% for race in contest.races %}
+                                        {% if (race.startTime | date('d.m.Y')) != actualDate %}
+                                            {% set actualDate = race.startTime | date('d.m.Y') %}
+                                            <li class="time-label">
+                                                <span class="bg-red">
+                                                  {{ actualDate }}
+                                                </span>
+                                            </li>
+                                        {% endif %}
+                                        <li>
+                                            <i class="fa fa-flag-checkered bg-blue"></i>
+                                            <div class="timeline-item">
+                                                <span class="time"><i class="fa fa-clock-o"></i> {{ race.startTime | date('H:i') }}</span>
+
+                                                <h3 class="timeline-header">
+                                                    <a href="{{ path('race_show', {'id': race.id}) }}">{{ race.name }}</a>
+                                                    {% if race.live %}<a class="btn btn-danger btn-xs" href="{{ path('race_live', {'id': race.id}) }}">LIVE - Oglądaj!</a>{% endif %}
+                                                </h3>
+
+                                                <div class="timeline-body">
+                                                    <strong>Dystans</strong>
+                                                    <p class="text-muted">{{ race.distance }} km</p>
+                                                    <strong>Zapisanych zawodników</strong>
+                                                    <p class="text-muted">{{ race.raceRunners | length }}</p>
+                                                    <strong>Wolne miejsca</strong>
+                                                    <p class="text-muted">
+                                                        {{ race.maxRunners - race.raceRunners | length }}
+                                                    </p>
+                                                    {% if race.categories | length > 0 %}
+                                                    <strong>Kategorie</strong>
+                                                    <p class="text-muted">
+                                                        {{ race.categories | join(', ') }}
+                                                    </p>
+                                                    {% endif %}
+                                                    {% if race.canSignOut(app.user) %}
+                                                    <strong class="show-link-for-localizators" style="cursor: pointer; text-decoration: underline">Pokaż link dla urządzeń dostarczących Twoje współrzędne</strong>
+                                                    <div class="hidden link-for-localizators">
+                                                        <strong>Link do dostarczania współrzędnych</strong>
+                                                        <p class="text-muted">http://nowrace.pl{{ path('race_set_cords', {'hashid': race.getRaceRunner(app.user.runner).id|hashid_encode}) }}?lat={wartosc_lat}&lng={wartosc_lng}</p>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="timeline-footer">
+                                                    <a class="btn btn-primary btn-xs" href="{{ path('race_show', {'id': race.id}) }}">Zobacz więcej</a>
+                                                    {% if race.canSign(app.user) %}<a class="btn btn-success btn-xs" href="{{ path('race_show', {'id': race.id}) }}">Zapisz się!</a>{% endif %}
+                                                    {% if race.canSignOut(app.user) %}<a class="btn btn-danger btn-xs" href="{{ path('signout_from_race', {'id': race.id}) }}">Wypisz się</a>{% endif %}
+                                                    {% if race.live %}<a class="btn btn-danger btn-xs" href="{{ path('race_live', {'id': race.id}) }}">Oglądaj!</a>{% endif %}
+                                                    {% if race.ended %}<a href="{{ path('race_preview', {'id': race.id}) }}" class="btn btn-xs btn-danger">Zobacz powtórkę!</a>{% endif %}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                    <!-- END timeline item -->
+                                    <li>
+                                        <i class="fa fa-clock-o bg-gray"></i>
+                                    </li>
+                                </ul>
+                            {% else %}
+                                Brak zaplanowanych wyścigów dla tych zawodów
+                            {% endif %}
+                        </div>
+                        <!-- /.tab-pane -->
+                    </div>
+                    <!-- /.tab-content -->
+                </div>
+                <!-- /.nav-tabs-custom -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </section>
+{% endblock %}
+{% block scripts %}
+    <script src="http://maps.google.com/maps/api/js?key=AIzaSyDVaGUTL1zg51-uT-Csnu-zafTAjR4xJOo" type="text/javascript"></script>
+    <script>
+        var adress = "{{ contest.adress }}";
+        $(document).ready(function () {
+            var geokoder = new google.maps.Geocoder();
+            geokoder.geocode({address: adress}, geocodingAction);
+
+            $(".show-link-for-localizators").click(function () {
+                $(this).next(".link-for-localizators").removeClass('hidden');
+                $(this).hide();
+            });
+        });
+
+        function mapStart(cords_from_address)
+        {
+            var cords = cords_from_address;
+            var options = {
+                zoom: 15,
+                center: cords,
+                disableDefaultUI: true
+            };
+            map = new google.maps.Map(document.getElementById("map"), options);
+            tooltip = new google.maps.InfoWindow();
+
+            map.setCenter(cords);
+            var marker = new google.maps.Marker(
+                {
+                    map: 		map,
+                    position: 	cords
+                }
+            );
+            tooltip.open(map, marker);
+            tooltip.setContent('<strong>Miejsce zawodów</strong><br />' + adress);
+
+        }
+
+        function geocodingAction(res, status)
+        {
+            if(status === google.maps.GeocoderStatus.OK){
+                mapStart(res[0].geometry.location);
+            }else {
+                console.log("nie mogę zlokalizować tego adresu:(");
+            }
+        }
+    </script>
+{% endblock %}
+{% block stylesheet %}
+{% endblock %}

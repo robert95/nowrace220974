@@ -1,0 +1,162 @@
+{% extends(":default:inside_index.html.twig") %}
+{% set pageName = "dashboard" %}
+{% block dashboardClassMenu %}active{% endblock %}
+{% block main %}
+    {% set company = app.user.company %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="small-box bg-aqua">
+                        <div class="inner">
+                            <h3>{{ company.contests | length }}</h3>
+                            <p>Twoje zawody</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-road"></i>
+                        </div>
+                        <a href="#" class="small-box-footer">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="small-box bg-red">
+                        <div class="inner">
+                            <h3>{{ company.countOfRaces }}</h3>
+                            <p>Twoje wyścigi</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-flag-o"></i>
+                        </div>
+                        <a href="#" class="small-box-footer">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="small-box bg-green">
+                        <div class="inner">
+                            <h3>{{ company.countOfRunners }}</h3>
+                            <p>łącznie zawodników</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-users"></i>
+                        </div>
+                        <a href="#" class="small-box-footer">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="small-box bg-yellow">
+                        <div class="inner">
+                            <h3>{{ (date(app.user.createdAt).diff(date())).days }}</h3>
+                            <p>dni w serwisie</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-clock-o"></i>
+                        </div>
+                        <a href="#" class="small-box-footer">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="box box-primary">
+                <div class="box-body box-profile">
+                    <h3 class="profile-username text-center">Run Company</h3>
+                    <p class="text-muted text-center">Organizator</p>
+                    <ul class="list-group list-group-unbordered">
+                        <li class="list-group-item">
+                            <b>Miasto</b> <p class="pull-right">{{ user.company.city }}</p>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Kod pocztowy</b> <p class="pull-right">{{ user.company.postCode }}</p>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Adres</b> <p class="pull-right">{{ user.company.street }}</p>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Numer telefonu</b> <p class="pull-right">{{ user.company.phone }}</p>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Kraj</b> <p class="pull-right">{{ user.company.country }}</p>
+                        </li>
+                    </ul>
+                    <a href="{{ path('profile_switcher') }}" class="btn btn-primary btn-block">Edytuj dane</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="box box-success">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Twoje nadchodzące zawody</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body" style="">
+                    {% set actualDate = null %}
+                    {% if company.activeContests | length > 0 %}
+                        <div class="tab-pane" id="timeline">
+                            <ul class="timeline timeline-inverse">
+                            {% for contest in company.activeContests  %}
+                                {% if (contest.startTime | date('d.m.Y')) != actualDate %}
+                                    {% set actualDate = contest.startTime | date('d.m.Y') %}
+                                    <li class="time-label">
+                                            <span class="bg-red">
+                                              {{ actualDate }}
+                                            </span>
+                                    </li>
+                                {% endif %}
+                                <li>
+                                    <i class="fa fa-flag-checkered bg-blue"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fa fa-clock-o"></i> {{ contest.startTime | date('H:i') }}</span>
+
+                                        <h3 class="timeline-header">
+                                            <a href="{{ path('contest_show', {'id': contest.id}) }}">{{ contest.name }}</a>
+                                        </h3>
+
+                                        <div class="timeline-body">
+                                            <strong>Lokalizacja</strong>
+                                            <p class="text-muted">{{ contest.adress }}</p>
+                                            <strong>Telefon</strong>
+                                            <p class="text-muted">{{ contest.company.phone }}</p>
+                                            <strong>WWW</strong>
+                                            <p class="text-muted">{{ contest.www }}</p>
+                                            <strong>Liczba wyścigów</strong>
+                                            <p class="text-muted">
+                                                {{ contest.races | length }}
+                                            </p>
+                                        </div>
+                                        <div class="timeline-footer">
+                                            <a class="btn btn-success btn-xs" href="{{ path('contest_show', {'id': contest.id}) }}">Zobacz więcej</a>
+                                            <a class="btn btn-primary btn-xs" href="{{ path('contest_edit', {'id': contest.id}) }}">Edytuj zawody</a>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                                <li>
+                                    <i class="fa fa-clock-o bg-gray"></i>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <p style="text-align: center;">
+                            Brak nadchodzących zawodów:( <br>
+                            Chcesz dodać nowe?
+                            <a class="btn btn-success btn-xs" href="{{ path('contest_add') }}">Dodaj zawody</a>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+    </script>
+{% endblock %}

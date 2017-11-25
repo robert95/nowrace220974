@@ -1,0 +1,128 @@
+{% extends 'bootstrap_3_layout.html.twig' %}
+
+{% block form_widget_simple -%}
+    {% if type is defined and type in ['date','datetime'] %}
+        {% set type = 'text' %}
+    {% endif %}
+    {{- parent() -}}
+{%- endblock form_widget_simple %}
+
+{% block button_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('btn-primary') ~ ' btn')|trim}) %}
+    {%- if label is empty -%}
+        {%- if label_format is not empty -%}
+            {% set label = label_format|replace({
+            '%name%': name,
+            '%id%': id,
+            }) %}
+        {%- else -%}
+            {% set label = name|humanize %}
+        {%- endif -%}
+    {%- endif -%}
+    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}><span class="btn-label">{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</span><span class="arrow-btn pull-right"></span><i class="material-icons">&#xE5C8;</i></button>
+{%- endblock %}
+{% block switch_widget %}
+    <label class="switch">
+        {%- block form_label -%}{{- parent() -}}{%- endblock form_label -%}
+        <input type="checkbox" {{ block('widget_attributes') }} {% if checked %} checked="checked"{% endif %} >
+        <div class="slider round"></div>
+    </label>
+{%- endblock %}
+
+{%- block radio_widget -%}
+    <div class="radio">
+        <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %} for="{{ id }}">
+        <span></span>{{ label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans({}, translation_domain)) -}}
+        </label>
+    </div>
+{%- endblock radio_widget -%}
+
+{%- block checkbox_widget -%}
+    <div class="checkbox">
+        <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %} for="{{ id }}">
+        <span></span>{{ label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans({}, translation_domain)) -}}
+        </label>
+    </div>
+{%- endblock checkbox_widget -%}
+
+{%- block choice_widget_collapsed -%}
+    {% if multiple %}
+        {%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}
+            {% set required = false %}
+        {%- endif -%}
+        <div class="multiple-select-wrapper">
+            {#<select class="single-select prettyNormalSelect">#}
+                    {#<option value="" selected="selected">{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>#}
+                {#{%- if preferred_choices|length > 0 -%}#}
+                    {#{% set options = preferred_choices %}#}
+                    {#{{- block('choice_widget_options') -}}#}
+                    {#{%- if choices|length > 0 and separator is not none -%}#}
+                        {#<option disabled="disabled">{{ separator }}</option>#}
+                    {#{%- endif -%}#}
+                {#{%- endif -%}#}
+                {#{%- set options = choices -%}#}
+                {#{{- block('choice_widget_options') -}}#}
+            {#</select>#}
+            <div class="multiple-select">
+                <div class="multipleselect-overflow"></div>
+                <select {{ block('widget_attributes') }} multiple="multiple" autocomplete="off">
+                    {%- if placeholder is not none -%}
+                        <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
+                    {%- endif -%}
+                    {%- if preferred_choices|length > 0 -%}
+                        {% set options = preferred_choices %}
+                        {{- block('choice_widget_options') -}}
+                        {%- if choices|length > 0 and separator is not none -%}
+                            <option disabled="disabled">{{ separator }}</option>
+                        {%- endif -%}
+                    {%- endif -%}
+                    {%- set options = choices -%}
+                    {{- block('choice_widget_options') -}}
+                </select>
+            </div>
+        </div>
+    {% else %}
+        {{- parent() -}}
+    {%- endif -%}
+{%- endblock choice_widget_collapsed -%}
+
+{% block date_widget -%}
+    {% if widget == 'single_text' %}
+        <div class="input-group date">
+            <span class="input-group-addon"><i class="material-icons">&#xE916;</i></span>
+            {{- block('form_widget_simple') -}}
+        </div>
+    {% else %}
+        {{- parent() -}}
+    {% endif %}
+{%- endblock date_widget %}
+
+{% block form_row -%}
+    <div class="form-group {% if form.vars.value is not empty %} has-value{% endif %} {% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
+        {{- form_label(form) -}}
+        {{- form_errors(form) -}}
+        {{- form_widget(form, {'attr' : {'autocomplete': 'off'}}) -}}
+    </div>
+{%- endblock form_row %}
+
+{% block submit_row -%}
+        <div class="form-group">
+            {{ form_widget(form) }}
+        </div>
+{% endblock submit_row %}
+
+{% block form_errors -%}
+    {% if errors|length > 0 -%}
+        <div class="form-errors">
+            {% if form.parent %}<span class="help-block">{% else %}<div class="alert alert-danger">{% endif %}
+            <ul class="list-unstyled">
+                {%- for error in errors -%}
+                    <li><span class="glyphicon glyphicon-exclamation-sign error-icon"></span> <span class="error-message">{{ error.message }}</span></li>
+                {%- endfor -%}
+            </ul>
+            {% if form.parent %}</span>{% else %}</div>{% endif %}
+        </div>
+    {%- endif %}
+{%- endblock form_errors %}

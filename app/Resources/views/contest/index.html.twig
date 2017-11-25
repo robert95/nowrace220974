@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Contests list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Www</th>
+                <th>City</th>
+                <th>Postcode</th>
+                <th>Street</th>
+                <th>Country</th>
+                <th>Starttime</th>
+                <th>Endtime</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for contest in contests %}
+            <tr>
+                <td><a href="{{ path('contest_show', { 'id': contest.id }) }}">{{ contest.id }}</a></td>
+                <td>{{ contest.name }}</td>
+                <td>{{ contest.www }}</td>
+                <td>{{ contest.city }}</td>
+                <td>{{ contest.postCode }}</td>
+                <td>{{ contest.street }}</td>
+                <td>{{ contest.country }}</td>
+                <td>{% if contest.startTime %}{{ contest.startTime|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if contest.endTime %}{{ contest.endTime|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('contest_show', { 'id': contest.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('contest_edit', { 'id': contest.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('contest_new') }}">Create a new contest</a>
+        </li>
+    </ul>
+{% endblock %}

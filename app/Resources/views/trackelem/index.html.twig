@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Trackelems list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Ordernumber</th>
+                <th>Partofrace</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for trackElem in trackElems %}
+            <tr>
+                <td><a href="{{ path('trackelem_show', { 'id': trackElem.id }) }}">{{ trackElem.id }}</a></td>
+                <td>{{ trackElem.orderNumber }}</td>
+                <td>{% if trackElem.partOfRace %}Yes{% else %}No{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('trackelem_show', { 'id': trackElem.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('trackelem_edit', { 'id': trackElem.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('trackelem_new') }}">Create a new trackElem</a>
+        </li>
+    </ul>
+{% endblock %}

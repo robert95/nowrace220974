@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Racecategories list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for raceCategory in raceCategories %}
+            <tr>
+                <td><a href="{{ path('racecategory_show', { 'id': raceCategory.id }) }}">{{ raceCategory.id }}</a></td>
+                <td>{{ raceCategory.name }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('racecategory_show', { 'id': raceCategory.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('racecategory_edit', { 'id': raceCategory.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('racecategory_new') }}">Create a new raceCategory</a>
+        </li>
+    </ul>
+{% endblock %}

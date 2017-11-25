@@ -1,0 +1,161 @@
+{% extends(":default:outside_index.html.twig") %}
+{% block menuAdditionalInfo %}
+{% endblock %}
+{% block main %}
+    {{ parent() }}
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-body box-profile">
+                        <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+                            <ol class="carousel-indicators">
+                                <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+                                <li data-target="#carousel-example-generic" data-slide-to="1" class=""></li>
+                                <li data-target="#carousel-example-generic" data-slide-to="2" class=""></li>
+                            </ol>
+                            <style>
+                                .carousel-inner h1{
+                                    text-align: center;
+                                    color: white;
+                                    font-size: 65px;
+                                    font-weight: bold;
+                                }
+                                .carousel-inner h2{
+                                    text-align: center;
+                                    color: white;
+                                    margin-top: 10px;
+                                }
+                                .carousel-inner .item{
+                                    padding: 150px 0;
+                                }
+                            </style>
+                            <div class="carousel-inner">
+                                <div class="item active" style="background-color: #00a65a !important;">
+                                    <h1>Na żywo</h1>
+                                    <h2>Oglądaj na mapie przebieg zawodów w czasie rzeczywistym!</h2>
+                                </div>
+                                <div class="item" style="background-color: #f39c12 !important">
+                                    <h1>Analiza</h1>
+                                    <h2>Analizuj swoje osiągnięcia!</h2>
+                                </div>
+                                <div class="item" style="background-color: #00c0ef !important">
+                                    <h1>Organizacja</h1>
+                                    <h2>Jesteś organizatorem? Zorganizuj swoje zawody!</h2>
+                                </div>
+                            </div>
+                            <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+                                <span class="fa fa-angle-left"></span>
+                            </a>
+                            <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+                                <span class="fa fa-angle-right"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-success">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Najbliższe biegi</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            {% for race in incommingRaces %}
+                                <div class="col-sm-4">
+                                    <div class="box box-success box-solid">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">{{ race.name }}</h3>
+                                        </div>
+                                        <div class="box-body">
+                                            <strong>Dystans</strong>
+                                            <p class="text-muted">{{ race.distance }} km</p>
+                                            <strong>Zapisanych zawodników</strong>
+                                            <p class="text-muted">{{ race.raceRunners | length }}</p>
+                                            <strong>Wolne miejsca</strong>
+                                            <p class="text-muted">
+                                                {{ race.maxRunners - race.raceRunners | length }}
+                                            </p>
+                                            {% if race.categories | length > 0 %}
+                                                <strong>Kategorie</strong>
+                                                <p class="text-muted">
+                                                    {{ race.categories | join(', ') }}
+                                                </p>
+                                            {% endif %}
+                                            {% if race.live %}<a class="btn btn-danger btn-block" href="{{ path('race_live', {'id': race.id}) }}">Oglądaj na żywa!</a>{% endif %}
+                                            {% if race.ended %}<a href="{{ path('race_preview', {'id': race.id}) }}" class="btn btn-block btn-danger">Zobacz powtórkę!</a>{% endif %}
+                                            {% if not race.live and not race.ended %}
+                                                <a class="btn btn-danger btn-block" href="#">Na żywo {{ race.startTime | date('H:i d-m-Y') }}</a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-warning">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Niedawno zakończone biegi</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            {% for race in endedRaces %}
+                                <div class="col-sm-4">
+                                    <div class="box box-warning box-solid">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">{{ race.name }} - {{ race.startTime | date('H:i d-m-Y') }}</h3>
+                                        </div>
+                                        <div class="box-body">
+                                            <strong>Dystans</strong>
+                                            <p class="text-muted">{{ race.distance }} km</p>
+                                            <strong>Zapisanych zawodników</strong>
+                                            <p class="text-muted">{{ race.raceRunners | length }}</p>
+                                            <strong>Wolne miejsca</strong>
+                                            <p class="text-muted">
+                                                {{ race.maxRunners - race.raceRunners | length }}
+                                            </p>
+                                            {% if race.categories | length > 0 %}
+                                                <strong>Kategorie</strong>
+                                                <p class="text-muted">
+                                                    {{ race.categories | join(', ') }}
+                                                </p>
+                                            {% endif %}
+                                            {% if race.live %}<a class="btn btn-danger btn-block" href="{{ path('race_live', {'id': race.id}) }}">Oglądaj na żywa!</a>{% endif %}
+                                            {% if race.ended %}<a href="{{ path('race_preview', {'id': race.id}) }}" class="btn btn-block btn-danger">Zobacz powtórkę!</a>{% endif %}
+                                            {% if not race.live and not race.ended %}
+                                                <a class="btn btn-danger btn-block" href="#">Na żywo {{ race.startTime | date('H:i d-m-Y') }}</a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block footer %}
+    <footer style="background-color: #222d32;">
+        <p style="margin: 10px; color: white; ">
+            Robert Przybylski - Politechnika Wrocławska - 2017
+        </p>
+    </footer>
+{% endblock %}
+{% block scripts %}
+    <script>
+        $(document).ready(function() {
+
+        } );
+    </script>
+{% endblock %}
+{% block stylesheet %}
+{% endblock %}

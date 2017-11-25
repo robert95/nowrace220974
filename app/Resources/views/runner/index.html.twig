@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Runners list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Gender</th>
+                <th>Birthdate</th>
+                <th>Club</th>
+                <th>Nationality</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for runner in runners %}
+            <tr>
+                <td><a href="{{ path('runner_show', { 'id': runner.id }) }}">{{ runner.id }}</a></td>
+                <td>{{ runner.name }}</td>
+                <td>{{ runner.surname }}</td>
+                <td>{% if runner.gender %}Yes{% else %}No{% endif %}</td>
+                <td>{% if runner.birthDate %}{{ runner.birthDate|date('Y-m-d') }}{% endif %}</td>
+                <td>{{ runner.club }}</td>
+                <td>{{ runner.nationality }}</td>
+                <td>{{ runner.phone }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('runner_show', { 'id': runner.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('runner_edit', { 'id': runner.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('runner_new') }}">Create a new runner</a>
+        </li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Trackelem</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ trackElem.id }}</td>
+            </tr>
+            <tr>
+                <th>Ordernumber</th>
+                <td>{{ trackElem.orderNumber }}</td>
+            </tr>
+            <tr>
+                <th>Partofrace</th>
+                <td>{% if trackElem.partOfRace %}Yes{% else %}No{% endif %}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('trackelem_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('trackelem_edit', { 'id': trackElem.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

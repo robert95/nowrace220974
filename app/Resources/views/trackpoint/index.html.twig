@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Trackpoints list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Ordernumber</th>
+                <th>Lat</th>
+                <th>Lng</th>
+                <th>Type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for trackPoint in trackPoints %}
+            <tr>
+                <td><a href="{{ path('trackpoint_show', { 'id': trackPoint.id }) }}">{{ trackPoint.id }}</a></td>
+                <td>{{ trackPoint.orderNumber }}</td>
+                <td>{{ trackPoint.lat }}</td>
+                <td>{{ trackPoint.lng }}</td>
+                <td>{{ trackPoint.type }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('trackpoint_show', { 'id': trackPoint.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('trackpoint_edit', { 'id': trackPoint.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('trackpoint_new') }}">Create a new trackPoint</a>
+        </li>
+    </ul>
+{% endblock %}

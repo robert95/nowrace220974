@@ -1,0 +1,245 @@
+{% extends(":default:inside_index.html.twig") %}
+{% set pageName = "dashboard" %}
+{% block dashboardClassMenu %}active{% endblock %}
+{% block main %}
+    {% set runner = app.user.runner %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="small-box bg-red">
+                        <div class="inner">
+                            <h3>{{ runner.endedRaces | length }}</h3>
+                            <p>W tylu wyścigach uczestniczyłeś</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-flag-o"></i>
+                        </div>
+                        <a href="#" class="small-box-footer">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="small-box bg-aqua">
+                        <div class="inner">
+                            <h3>{{ runner.sumOfMeters  }}</h3>
+                            <p>Tyle metrów przebiegłeś</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-road"></i>
+                        </div>
+                        <a href="#" class="small-box-footer">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="small-box bg-yellow">
+                        <div class="inner">
+                            <h3>{{ runner.sumOfTime }}</h3>
+                            <p>Tyle minut Ci to zajęło</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-clock-o"></i>
+                        </div>
+                        <a href="#" class="small-box-footer">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="small-box bg-green">
+                        <div class="inner">
+                            <h3>{{ runner.activeRaces | length }}</h3>
+                            <p>Przed Tobą jeszcze tyle wyścigów</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-users"></i>
+                        </div>
+                        <a href="#" class="small-box-footer">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="box box-primary">
+                <div class="box-body box-profile">
+                    <h3 class="profile-username text-center">{{ app.user.fullName }}</h3>
+                    <p class="text-muted text-center">Zawodnik</p>
+                    <ul class="list-group list-group-unbordered">
+                        <li class="list-group-item">
+                            <b>Numer telefonu</b> <p class="pull-right">{{ user.runner.phone }}</p>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Płec</b> <p class="pull-right">{% if user.runner.gender == 1 %}kobieta{% else %}mężczyzna{% endif %}</p>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Data urodzenia</b> <p class="pull-right">{{ user.runner.birthDate | date("d/m/Y") }}</p>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Klub</b> <p class="pull-right">{{ user.runner.club }}</p>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Kraj</b> <p class="pull-right">{{ user.runner.nationality }}</p>
+                        </li>
+                    </ul>
+                    <a href="{{ path('profile_switcher') }}" class="btn btn-primary btn-block">Edytuj dane</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="box box-success">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Twoje nadchodzące wyścigi</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body" style="">
+                    {% set actualDate = null %}
+                    {% if runner.activeRaces | length > 0 %}
+                        <div class="tab-pane" id="timeline">
+                            <ul class="timeline timeline-inverse">
+                                {% for raceRunner in runner.activeRaces %}
+                                    {% set race = raceRunner.race %}
+                                    {% if (race.startTime | date('d.m.Y')) != actualDate %}
+                                        {% set actualDate = race.startTime | date('d.m.Y') %}
+                                        <li class="time-label">
+                                                <span class="bg-red">
+                                                  {{ actualDate }}
+                                                </span>
+                                        </li>
+                                    {% endif %}
+                                    <li>
+                                        <i class="fa fa-flag-checkered bg-blue"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fa fa-clock-o"></i> {{ race.startTime | date('H:i') }}</span>
+
+                                            <h3 class="timeline-header">
+                                                <a href="{{ path('race_show', {'id': race.id}) }}">{{ race.name }}</a>
+                                                {% if race.live %}<a class="btn btn-danger btn-xs" href="{{ path('race_live', {'id': race.id}) }}">LIVE - Oglądaj!</a>{% endif %}
+                                            </h3>
+
+                                            <div class="timeline-body">
+                                                <strong>Dystans</strong>
+                                                <p class="text-muted">{{ race.distance }} km</p>
+                                                <strong>Zapisanych zawodników</strong>
+                                                <p class="text-muted">{{ race.raceRunners | length }}</p>
+                                                <strong>Wolne miejsca</strong>
+                                                <p class="text-muted">
+                                                    {{ race.maxRunners - race.raceRunners | length }}
+                                                </p>
+                                                {% if race.categories | length > 0 %}
+                                                    <strong>Kategorie</strong>
+                                                    <p class="text-muted">
+                                                        {{ race.categories | join(', ') }}
+                                                    </p>
+                                                {% endif %}
+                                                <strong class="show-link-for-localizators" style="cursor: pointer; text-decoration: underline">Pokaż link dla urządzeń dostarczących Twoje współrzędne</strong>
+                                                <div class="hidden link-for-localizators">
+                                                    <strong>Link do dostarczania współrzędnych</strong>
+                                                    <p class="text-muted">http://nowrace.pl{{ path('race_set_cords', {'hashid': raceRunner.id|hashid_encode}) }}?lat={wartosc_lat}&lng={wartosc_lng}</p>
+                                                </div>
+                                            </div>
+                                            <div class="timeline-footer">
+                                                <a class="btn btn-primary btn-xs" href="{{ path('race_show', {'id': race.id}) }}">Zobacz więcej</a>
+                                                {% if race.canSign(app.user) %}<a class="btn btn-success btn-xs" href="{{ path('race_show', {'id': race.id}) }}">Zapisz się!</a>{% endif %}
+                                                {% if race.canSignOut(app.user) %}<a class="btn btn-danger btn-xs" href="{{ path('signout_from_race', {'id': race.id}) }}">Wypisz się</a>{% endif %}
+                                                {% if race.live %}<a class="btn btn-danger btn-xs" href="{{ path('race_live', {'id': race.id}) }}">Oglądaj!</a>{% endif %}
+                                                {% if race.ended %}<a href="{{ path('race_preview', {'id': race.id}) }}" class="btn btn-xs btn-danger">Zobacz powtórkę!</a>{% endif %}
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                                <li>
+                                    <i class="fa fa-clock-o bg-gray"></i>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <p style="text-align: center;">
+                            Brak nadchodzących wyścigów:( <br>
+                            Może zapiszesz się na któryś z tych?
+                            <a class="btn btn-success btn-xs" href="{{ path('active_contests') }}">Lista zawody</a>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="box box-danger">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Twoje zakończone wyścigi</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body" style="">
+                    {% set actualDate = null %}
+                    {% if runner.activeRaces | length > 0 %}
+                        <div class="tab-pane" id="timeline">
+                            <ul class="timeline timeline-inverse">
+                                {% for raceRunner in runner.endedRaces %}
+                                    {% set race = raceRunner.race %}
+                                    {% if (race.startTime | date('d.m.Y')) != actualDate %}
+                                        {% set actualDate = race.startTime | date('d.m.Y') %}
+                                        <li class="time-label">
+                                                <span class="bg-red">
+                                                  {{ actualDate }}
+                                                </span>
+                                        </li>
+                                    {% endif %}
+                                    <li>
+                                        <i class="fa fa-flag-checkered bg-blue"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fa fa-clock-o"></i> {{ race.startTime | date('H:i') }}</span>
+
+                                            <h3 class="timeline-header">
+                                                <a href="{{ path('race_show', {'id': race.id}) }}">{{ race.name }}</a>
+                                            </h3>
+
+                                            <div class="timeline-body">
+                                                <strong>Miejsce</strong>
+                                                <p class="text-muted">{{ raceRunner.finishPlace }}</p>
+                                                <strong>Czas</strong>
+                                                <p class="text-muted">{{ raceRunner.prettyTime }}</p>
+                                                <strong>Dystans</strong>
+                                                <p class="text-muted">{{ race.distance }} km</p>
+                                                <strong>Zapisanych zawodników</strong>
+                                                <p class="text-muted">{{ race.raceRunners | length }}</p>
+                                            </div>
+                                            <div class="timeline-footer">
+                                                <a class="btn btn-primary btn-xs" href="{{ path('race_show', {'id': race.id}) }}">Zobacz więcej</a>
+                                                {% if race.ended %}<a href="{{ path('race_preview', {'id': race.id}) }}" class="btn btn-xs btn-danger">Zobacz powtórkę!</a>{% endif %}
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                                <li>
+                                    <i class="fa fa-clock-o bg-gray"></i>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <p style="text-align: center;">
+                            Brak zakończonych wyścigów:( <br>
+                            Może zapiszesz się na któryś z tych?
+                            <a class="btn btn-success btn-xs" href="{{ path('active_contests') }}">Lista zawody</a>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            $(".show-link-for-localizators").click(function () {
+                $(this).next(".link-for-localizators").removeClass('hidden');
+                $(this).hide();
+            });
+        });
+    </script>
+{% endblock %}

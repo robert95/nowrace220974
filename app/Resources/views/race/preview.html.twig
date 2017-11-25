@@ -1,0 +1,343 @@
+{% extends(":default:outside_index.html.twig") %}
+{% set pageName = race.name %}
+{% block contestClassMenu %}active{% endblock %}
+{% set company = race.contest.company %}
+{% block menuAdditionalInfo %}
+    {{ race.name }} - {{ race.startTime | date("d-m-Y H:i") }}
+{% endblock %}
+{% block main %}
+    {{ parent() }}
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12 col-sm-2">
+                <button class="btn btn-danger" onclick="stopPreview();"><i class="fa fa-square"></i></button>
+                <button class="btn btn-warning" onclick="pausePreview();"><i class="fa fa-pause"></i></button>
+                <button class="btn btn-success" onclick="startPreview();"><i class="fa fa-play"></i></button>
+            </div>
+            <div class="col-xs-12 col-sm-4">
+                <div class="form-group">
+                    <input id="live_seatch" class="form-control" type="text" placeholder="Wpisz imię lub nazwisko zawodnika...">
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div id="map" style="width: 100%; height: 500px;">
+
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block scripts %}
+    <script src="{{ asset('js/jquery.easing.1.3.js') }}"></script>
+    <script src="http://maps.google.com/maps/api/js?key=AIzaSyDVaGUTL1zg51-uT-Csnu-zafTAjR4xJOo" type="text/javascript"></script>
+    <script src="{{ asset('js/markerAnimate.js') }}"></script>
+    <script src="{{ asset('js/SlidingMarker.min.js') }}"></script>
+    <script src="{{ asset('js/turf.min.js') }}" charset="utf-8"></script>
+    <script>
+        SlidingMarker.initializeGlobally();
+    </script>
+    <script>
+        $(document).ready(function() {
+            renderRoute();
+        } );
+    </script>
+    <script>
+        var location_data = JSON.parse("{{ location_data | json_encode | e('js') }}");
+        var adress = "{{ race.contest.adress }}";
+        var map;
+        var markers = [];
+        var runners = [];
+        var runnersInfo = [];
+        var route;
+        var geoJson;
+        var countOfMarkers = {{ race.track.trackElems[0].points | length }};
+        var startedPosition = {lat: {{ race.track.trackElems[0].points[0].lat }}, lng: {{ race.track.trackElems[0].points[0].lng }} };
+        var infoWindow = new google.maps.InfoWindow({
+          content: ''
+        });
+		var runner_icon = {
+            url: '{{ asset('img/runner_icon.png') }}',
+            size: new google.maps.Size(30, 43),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(15, 43),
+            scaledSize: new google.maps.Size(30, 43)
+        };
+        var empty_icon = {
+            url: '{{ asset('img/empty_icon.png') }}'
+        };
+
+        function renderRoute(){
+            if(!map){
+                var geokoder = new google.maps.Geocoder();
+                geokoder.geocode({address: adress}, geocodingAction);
+            }
+        }
+
+        function geocodingAction(res, status)
+        {
+            if(status === google.maps.GeocoderStatus.OK){
+                mapStart(res[0].geometry.location);
+            }else {
+                console.log("nie mogę zlokalizować tego adresu:(");
+            }
+        }
+
+
+        function mapStart(cords_from_address)
+        {
+            var center_cords = markers.length > 0
+                                ? markers[0].getPosition()
+                                : cords_from_address;
+
+            var map_options = {
+                zoom: 15,
+                center: center_cords,
+                disableDefaultUI: true
+            };
+
+            map = new google.maps.Map(document.getElementById("map"), map_options);
+
+            route = new google.maps.Polyline({
+                map: 			map,
+                path: 			getCordsFromMarkers(),
+                strokeColor:	'#ff0000',
+                strokeWeight:	3,
+                editable: false
+            });
+
+            {% for cords in race.track.trackElems[0].points %}
+                addMarker({lat: {{ cords.lat }}, lng: {{ cords.lng }} });
+            {% endfor %}
+
+            {% for raceRunner in race.raceRunners %}
+                addMarkerRunner(startedPosition, {{ raceRunner.runner.id }}, '{{ raceRunner.runner.prettyName }}');
+            {% endfor %}
+        }
+
+        function addMarker(latlng)
+        {
+            var icon_url = markers.length === 0 ? '{{ asset('img/flag_icon.ico') }}' : '{{ asset('img/finish_flag_icon.ico') }}';
+
+            var marker = new google.maps.Marker({
+                position: latlng,
+                map: map,
+                icon: {
+                    url: icon_url,
+                    size: new google.maps.Size(30, 30),
+                    origin: new google.maps.Point(0, 0),
+                    anchor: new google.maps.Point(0, 30),
+                    scaledSize: new google.maps.Size(30, 30)
+                }
+            });
+
+            markers.push(marker);
+            drawRoute();
+            updateMarkersIcons();
+
+            if(markers.length === countOfMarkers){
+                var bounds = new google.maps.LatLngBounds();
+                for (var i = 0; i < markers.length; i++) {
+                    bounds.extend(markers[i].getPosition());
+                }
+                map.fitBounds(bounds);
+                exportGeoJson(route);
+            }
+        }
+
+        function addMarkerRunner(latlng, id, title)
+        {
+            var marker = new google.maps.Marker({
+                position: latlng,
+                map: map,
+                icon: runner_icon,
+                easing: "linear",
+				title: title
+            });
+
+			marker.addListener('click', function() {
+				infoWindow.setContent(marker.title);
+				infoWindow.open(map, marker);
+			});
+			
+            runners[id] = marker;
+            runnersInfo[id] = {
+                last_run_point_id: -1,
+                last_timestamp: -1,
+                categories: ['K20, K30'],
+                name: 'Jan Kowalski(PL) - 1995'
+            };
+        }
+
+        function drawRoute(){
+            route.setPath(getCordsFromMarkers());
+        }
+
+        function getCordsFromMarkers(){
+            return markers.map(getCordsFromMarker);
+        }
+
+        function getCordsFromMarker(item){
+            return {lat: item.getPosition().lat(), lng: item.getPosition().lng()};
+        }
+
+        function updateMarkersIcons(){
+            for(var i = 0; i < markers.length; i++){
+                var icon_url = i === 0
+                    ? '{{ asset('img/flag_icon.ico') }}'
+                    : i === markers.length -1
+                        ? '{{ asset('img/finish_flag_icon.ico') }}'
+                        : '{{ asset('img/empty_icon.png') }}';
+
+                var icon = {
+                    url: icon_url,
+                    size: new google.maps.Size(30, 30),
+                    origin: new google.maps.Point(0, 0),
+                    anchor: new google.maps.Point(0, 30),
+                    scaledSize: new google.maps.Size(30, 30)
+                };
+
+                markers[i].setIcon(icon);
+            }
+        }
+
+        function exportGeoJson(route) {
+            geoJson = {
+                "type": "FeatureCollection",
+                "features": []
+            };
+            var polylineFeature = {
+                "type": "Feature",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": []
+                },
+                "properties": {}
+            };
+            for (var i = 0; i < route.getPath().getLength(); i++) {
+                var pt = route.getPath().getAt(i);
+                polylineFeature.geometry.coordinates.push([
+                    pt.lng(), pt.lat()
+                ]);
+            }
+            geoJson.features.push(polylineFeature);
+        }
+
+        function getClosestPointOnPolyline(lat, lng){
+            var line = turf.lineString(geoJson.features[0].geometry.coordinates);
+            var pt = turf.point([lng, lat]);
+            var snapped = turf.pointOnLine(line, pt);
+            var pstnOnLine = { lat: snapped.geometry.coordinates[1], lng: snapped.geometry.coordinates[0] };
+            var distToLine = snapped.properties.dist;
+            return pstnOnLine;
+        }
+
+        function moveMarkerToPosition(marker, cords, duration){
+            marker.setDuration(duration);
+            marker.setPosition(cords);
+        }
+
+        var i = 0;
+        var maxI = location_data.length;
+        var start_race_time = Date.now();
+        var current_race_time = 0;
+        var paused_time = 0;
+        var playing = true;
+        function updateRunnersPosition(){
+            current_race_time = Date.now() - start_race_time - paused_time;
+            if(i < maxI && (location_data[i].time*1000) <= current_race_time ){
+                var data = location_data[i].points;
+                for(var k = 0; k < data.length; k++){
+                    var runner = data[k];
+                    if(runnersInfo[runner.id].last_run_point_id !== runner.run_point_id){
+                        var duration = 1;
+                        if(runnersInfo[runner.id].last_timestamp !== -1){
+                            duration = (runner.timestamp - runnersInfo[runner.id].last_timestamp)*1000;
+                        }else{
+                            if(i > 0){
+                                duration = (runner.timestamp - location_data[i-1].points[k].timestamp)*1000;
+                            }
+                        }
+                        moveMarkerToPosition(runners[runner.id], getClosestPointOnPolyline(runner.lat, runner.lng), duration);
+                        runnersInfo[runner.id].last_timestamp = runner.timestamp;
+                        runnersInfo[runner.id].last_run_point_id = runner.run_point_id;
+                    }
+                }
+                i++;
+            }
+        }
+
+        function filterRunners(value){
+            runners.forEach(function(runner) {
+                if(runner.title.toLowerCase().indexOf(value.toLowerCase()) !== -1){
+                    runner.setIcon(runner_icon);
+                }else{
+                    runner.setIcon(empty_icon);
+                }
+            });
+        }
+
+        var stopped = false;
+        function stopPreview() {
+            stopped = true;
+            i = 0;
+            start_race_time = Date.now();
+            current_race_time = 0;
+            paused_time = 0;
+            playing = false;
+            runners.forEach(function(runner) {
+                runner.setPositionNotAnimated(startedPosition);
+            });
+            runnersInfo.forEach(function(runnerInfo) {
+                runnerInfo.last_run_point_id = -1;
+                runnerInfo.last_timestamp = -1;
+            });
+        }
+
+        function startPreview() {
+            if(paused){
+                paused_time += Date.now() - startPausedTime;
+                startPausedTime = -1;
+                paused = false;
+            }
+            if(stopped){
+                start_race_time = Date.now();
+                stopped = false;
+            }
+            playing = true;
+        }
+
+        var startPausedTime = -1;
+        var paused = false;
+        function pausePreview() {
+            startPausedTime = Date.now();
+            paused = true;
+            playing = false;
+            runners.forEach(function(runner) {
+                runner.setPositionNotAnimated(runner.getAnimationPosition());
+            });
+            runnersInfo.forEach(function(runnerInfo) {
+                runnerInfo.last_run_point_id = -1;
+                runnerInfo.last_timestamp = -1;
+            });
+        }
+    </script>
+    <script>
+        $(document).ready(function() {
+            setInterval(function(){
+                if(playing){
+                    updateRunnersPosition();
+                }
+            }, 1000);
+        } );
+    </script>
+    <script>
+        $(document).ready(function() {
+            $("#live_seatch").keyup(function () {
+                filterRunners($(this).val());
+            })
+        } );
+    </script>
+{% endblock %}
+{% block stylesheet %}
+    <link rel="stylesheet" href="/template/plugins/datatables/dataTables.bootstrap.css">
+{% endblock %}

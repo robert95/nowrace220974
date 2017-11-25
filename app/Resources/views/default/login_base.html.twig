@@ -1,0 +1,14 @@
+{% extends ':default:base.html.twig' %}
+{% block title %}Witamy w NowRace.pl!{% endblock %}
+{% block bodyClass %}login-body{% endblock %}
+
+{% block body %}
+    {% include ':default:flash.html.twig' %}
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('build/global.css') }}">
+{% endblock %}
+{% block javascripts %}
+    <script src="{{ asset('build/app.js') }}"></script>
+{% endblock %}

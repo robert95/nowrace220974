@@ -1,0 +1,78 @@
+{% extends(":default:inside_index.html.twig") %}
+{% set pageName = "Mój profil" %}
+{% block profileClassMenu %}active{% endblock %}
+{% block main %}
+    {{ parent() }}
+    <div class="row profile-page">
+        <div class="col-xs-12 col-sm-6">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Mój profil</h3>
+                </div>
+                <div class="box-body no-padding">
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr>
+                                <td>Imię</td>
+                                <td>{{ user.runner.name }}</td>
+                            </tr>
+                            <tr>
+                                <td>Nazwisko</td>
+                                <td>{{ user.runner.surname }}</td>
+                            </tr>
+                            <tr>
+                                <td>Numer telefonu</td>
+                                <td>{{ user.runner.phone }}</td>
+                            </tr>
+                            <tr>
+                                <td>Płec</td>
+                                <td>{% if user.runner.gender == 1 %}kobieta{% else %}mężczyzna{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td>Data urodzenia</td>
+                                <td>{{ user.runner.birthDate | date("d/m/Y") }}</td>
+                            </tr>
+                            <tr>
+                                <td>Klub</td>
+                                <td>{{ user.runner.club }}</td>
+                            </tr>
+                            <tr>
+                                <td>Kraj</td>
+                                <td>{{ user.runner.nationality }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-6">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Edycja</h3>
+                </div>
+                <!-- /.box-header -->
+                <!-- form start -->
+                {{ form_start(form) }}
+                    <div class="box-body">
+                        {{ form_row(form.name, {'label': "Imię" }) }}
+                        {{ form_row(form.surname, {'label': "Nazwisko" }) }}
+                        {{ form_row(form.phone, {'label': "Numer telefonu" }) }}
+                        {{ form_row(form.gender, {'label': "Płeć" }) }}
+                        {{ form_row(form.birthDate, {'label': "Data urodzenia" }) }}
+                        {{ form_row(form.club, {'label': "Klub" }) }}
+                        {{ form_row(form.nationality, {'label': "Kraj" }) }}
+                    </div>
+                    <!-- /.box-body -->
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-info pull-right">Zapisz zmiany</button>
+                    </div>
+                    <!-- /.box-footer -->
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+    </script>
+{% endblock %}

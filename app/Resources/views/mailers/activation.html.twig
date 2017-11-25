@@ -1,0 +1,43 @@
+{% extends 'mailers/base.html.twig' %}
+{%
+    set href = url('confirm_account', {
+        'email':   email,
+        'token':   token
+    })
+%}
+
+{% block body %}
+    <h1 style="padding-top: 6px;font-size:30px;font-weight:normal;padding:0;margin:0 0 20px">
+        Prosimy potwierdź swój email
+    </h1>
+    <p style="font-size:16px;margin:0 0 20px;padding:0;line-height:22px">
+    Dziękujemy za dołączenie do platformy NowRace.pl
+
+    Już teraz zacznij uczestnicznyć w najlepszych imprezach biegowcyh w Polsce.
+    <p style="font-size:16px;padding:0;line-height:22px">To proste - kliknij przycisk poniżej:</p>
+
+    </p>
+    <a href="{{ href }}" style="text-decoration:none;display:block">
+        <table cellpadding="0" cellspacing="0" style="border:0;">
+            <tbody><tr>
+                <td style="vertical-align:top">
+                </td>
+                <td style="padding: 0px 20px; vertical-align:middle;font-size:20px;color:white;background:#00adef;height:60px">
+                    Potwierdź adres e-mail
+                </td>
+                <td style="vertical-align:top">
+                </td>
+            </tr>
+            </tbody></table>
+    </a>
+{% endblock %}
+
+{% block footer %}
+    <br>
+    Przycisk nie działa? Skopiuj adres i wklej do przeglądarki poniższy adres:<br>
+    <a style="color:#3e7cd0;text-decoration:none" href="{{ href }}">
+        {{ href }}
+    </a>
+    <br>
+    Otrzymałeś tę wiadomość ponieważ zarejestrowałeś się na NowRace.pl. Ze względów bezpieczeństwa nie przesyłaj tej wiadomości do nikogo, ani nie kopiuj jej zawartości do innych dokumentów.
+{% endblock %}

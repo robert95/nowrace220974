@@ -1,0 +1,56 @@
+{% extends 'default/themes/html_base.html.twig' %}
+{% set body_class = 'error' %}
+{% block html_class %} class="error" {% endblock %}
+{% block body %}
+    <div class="container-fluid col-md-12 errorPage">
+        <div class="row top">
+            <div class="col-md-12 errorBox">
+                <div id="ellipses">
+                    {% set errorNumbers = status_code | split('') %}
+                    {% for errorNumber in errorNumbers %}
+                        <div class="ellipse">
+                            <div class="text">{{ errorNumber }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% block status_text %}{% endblock %}
+            </div>
+            <div id="homepageButton">
+                <a href="{{ path('dashboard') }}"  class="btn-success btn">
+                    <span class="btn-label">
+                        {{ 'error.homepage' | trans }}
+                    </span>
+                    <span class="arrow-btn pull-right"></span>
+                    <i class="material-icons"></i>
+                </a>
+            </div>
+
+        </div>
+        <div class="row footer">
+            <footer class="col-md-12 ">
+                <div class="footer-wrapper">
+                    <div class="col-xs-12 col-md-5">
+                        <ul class="list-unstyled list-inline" id="terms-of-use">
+                            <li><a href="{{ asset('pdf/regulamin.pdf') }}" target="_blank">{{ 'terms' | trans }}</a></li>
+                            <li><a href="{{ asset('pdf/polityka-prywatnosci.pdf') }}" target="_blank">{{ 'privacy_policy' | trans }}</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-2"></div>
+                    <div class="col-xs-12 col-md-5">
+                        <ul class="list-unstyled list-inline text-center" id="partners">
+                            <li class="partners-text">Partnerzy:</li>
+                            <li><a href="http://truckerslife.eu/" target="_blank"><img src="{{ asset('images/truckerslife.svg') }}" width="150" height="35"></a></li>
+                            <li class="trans-logo"><a href="http://trans.eu/" target="_blank"><img src="{{ asset('images/transeu.svg') }}" width="100" height="47"></a></li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-12 app-version text-center">
+                        <p>{{ app_ver }}</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+
+{% endblock %}

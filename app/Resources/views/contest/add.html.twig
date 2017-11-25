@@ -1,0 +1,64 @@
+{% extends(":default:inside_index.html.twig") %}
+{% set pageName = "Moje zawody - dodawanie zawodów" %}
+{% set pageHeader = "Dodawanie zawodów" %}
+{% set submitBtn = "Dodaj zawody" %}
+{% block contestClassMenu %}active{% endblock %}
+{% block myContestsClassMenu %}active{% endblock %}
+{% block main %}
+    {{ parent() }}
+    <div class="row add-contests-page">
+        <div class="col-xs-12 col-sm-12">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h3 class="box-title">{{ pageHeader }}</h3>
+                </div>
+                {{ form_start(form) }}
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            {{ form_row(form.name, {'label': "Nazwa zawodów" }) }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ form_row(form.startTime, {'label': "Data rozpoczęcia" }) }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ form_row(form.endTime, {'label': "Data zakończenia" }) }}
+                        </div>
+                        <div class="col-sm-4">
+                            {{ form_row(form.city, {'label': "Miasto" }) }}
+                        </div>
+                        <div class="col-sm-2">
+                            {{ form_row(form.postCode, {'label': "Kod pocztowy" }) }}
+                        </div>
+                        <div class="col-sm-4">
+                            {{ form_row(form.street, {'label': "Ulica" }) }}
+                        </div>
+                        <div class="col-sm-2">
+                            {{ form_row(form.country, {'label': "Kraj" }) }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ form_row(form.notice, {'label': "O zawodach" }) }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ form_row(form.www, {'label': "Adres strony www" }) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-info pull-right">{{ submitBtn }}</button>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12">
+            {% block rightSide %}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+    </script>
+{% endblock %}
+{% block stylesheet %}
+{% endblock %}

@@ -1,0 +1,376 @@
+{% extends(":default:inside_index.html.twig") %}
+{% set pageName = race.name %}
+{% block contestClassMenu %}active{% endblock %}
+{% set company = race.contest.company %}
+{% block main %}
+    {{ parent() }}
+    <section class="content">
+        <div class="row">
+            <!-- /.col -->
+            <div class="col-md-12">
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#race-info" data-toggle="tab" aria-expanded="true">Informacje</a></li>
+                        <li class="" onclick="renderRoute();"><a href="#race-track" data-toggle="tab" aria-expanded="false">Trasa</a></li>
+                        <li class=""><a href="#race-runners" data-toggle="tab" aria-expanded="false">Zawodnicy</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="race-info">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="clearfix" style="margin-bottom: 20px">
+                                        <div class="pull-right">
+                                            {% if race.canSign(app.user) %}<button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#sign-for-race">Zapisz się!</button>{% endif %}
+                                            {% if race.canSignOut(app.user) %}<a class="btn btn-danger btn-sm" href="{{ path('signout_from_race', {'id': race.id}) }}">Wypisz się</a>{% endif %}
+                                            {% if race.live %}<a href="{{ path('race_live', {'id': race.id}) }}" class="btn btn-sm btn-danger">Oglądaj na żywo!</a>{% endif %}
+                                            {% if race.ended %}<a href="{{ path('race_preview', {'id': race.id}) }}" class="btn btn-sm btn-danger">Zobacz powtórkę!</a>{% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-6 col-xs-12">
+                                            <div class="small-box bg-aqua">
+                                                <div class="inner">
+                                                    <h3>{{ race.distance }} km</h3>
+                                                    <p>Dystans</p>
+                                                </div>
+                                                <div class="icon">
+                                                    <i class="fa fa-road"></i>
+                                                </div>
+                                                <a href="#" class="small-box-footer">
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 col-xs-12">
+                                            <div class="small-box bg-green">
+                                                <div class="inner">
+                                                    <h3>{{ race.raceRunners | length }}</h3>
+                                                    <p>Zawodników</p>
+                                                </div>
+                                                <div class="icon">
+                                                    <i class="fa fa-users"></i>
+                                                </div>
+                                                <a href="#" class="small-box-footer">
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 col-xs-12">
+                                            <div class="small-box bg-red">
+                                                <div class="inner">
+                                                    <h3>{{ race.maxRunners - race.raceRunners | length }}</h3>
+                                                    <p>Wolne miejsca</p>
+                                                </div>
+                                                <div class="icon">
+                                                    <i class="fa fa-flag-o"></i>
+                                                </div>
+                                                <a href="#" class="small-box-footer">
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 col-xs-12">
+                                            <div class="small-box bg-yellow">
+                                                <div class="inner">
+                                                    {% if race.startTime > date() %}
+                                                        <h3>{{ (date(race.startTime).diff(date())).days }}</h3>
+                                                        <p>Dni do startu</p>
+                                                    {% else %}
+                                                        <h3>0</h3>
+                                                        <p>Dni do startu</p>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="icon">
+                                                    <i class="fa fa-clock-o"></i>
+                                                </div>
+                                                <a href="#" class="small-box-footer">
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="box box-primary box-solid">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title"><strong>{{ race.name }} - {{ race.startTime | date("d.m.Y H:i") }}</strong></h3>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <strong><i class="fa fa-road margin-r-5"></i> Zawody</strong>
+                                                    <p class="text-muted">{{ race.contest.name }}</p>
+                                                    <hr>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <strong><i class="fa fa-user margin-r-5"></i> Organizator</strong>
+                                                    <p class="text-muted">{{ race.contest.company.name }}</p>
+                                                    <hr>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <strong><i class="fa fa-map-marker margin-r-5"></i> Lokalizacja</strong>
+                                                    <p class="text-muted">{{ race.contest.adress }}</p>
+                                                    <hr>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <strong><i class="fa fa-phone margin-r-5"></i> Telefon</strong>
+                                                    <p class="text-muted">{{ race.contest.company.phone }}</p>
+                                                    <hr>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <strong><i class="fa fa-internet-explorer margin-r-5"></i> WWW</strong>
+                                                    <p class="text-muted"><a href="http://{{ race.contest.www }}">{{ race.contest.www }}</a></p>
+                                                    <hr>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <strong><i class="fa fa-file-text-o margin-r-5"></i> Notatka</strong>
+                                                    <p>{{ race.contest.notice }}</p>
+                                                    <hr>
+                                                </div>
+                                                {% if race.canSignOut(app.user) %}
+                                                <div class="col-sm-12">
+                                                    <strong class="show-link-for-localizators" style="cursor: pointer; text-decoration: underline">Pokaż link dla urządzeń dostarczących Twoje współrzędne</strong>
+                                                    <div class="hidden link-for-localizators">
+                                                        <strong>Link do dostarczania współrzędnych</strong>
+                                                        <p class="text-muted">http://nowrace.pl{{ path('race_set_cords', {'hashid': race.getRaceRunner(app.user.runner).id|hashid_encode}) }}?lat={wartosc_lat}&lng={wartosc_lng}</p>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="race-track">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div id="map" style="width: 100%; height: 500px;">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="race-runners">
+                            {% if race.raceRunners | length > 0 %}
+                                <div class="text-right">
+                                    {% if race.canSign(app.user) %}<button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#sign-for-race">Zapisz się!</button>{% endif %}
+                                    {% if race.canSignOut(app.user) %}<a class="btn btn-danger btn-sm" href="{{ path('signout_from_race', {'id': race.id}) }}">Wypisz się</a>{% endif %}
+                                    <hr>
+                                </div>
+                                <table id="example" class="table table-striped table-bordered" width="100%" cellspacing="0">
+                                    <thead>
+                                    <tr>
+                                        <th>Nr</th>
+                                        <th>Imie</th>
+                                        <th>Nazwisko</th>
+                                        <th>Płeć</th>
+                                        <th>Klub</th>
+                                        <th>Rok ur.</th>
+                                        <th>Kategorie</th>
+                                        <th>Miejsce</th>
+                                        <th>Czas</th>
+                                    </tr>
+                                    </thead>
+                                    <tfoot>
+                                    <tr>
+                                        <th>Nr</th>
+                                        <th>Imie</th>
+                                        <th>Nazwisko</th>
+                                        <th>Płeć</th>
+                                        <th>Klub</th>
+                                        <th>Rok ur.</th>
+                                        <th>Kategorie</th>
+                                        <th>Miejsce</th>
+                                        <th>Czas</th>
+                                    </tr>
+                                    </tfoot>
+                                    <tbody>
+                                    {% for runner in race.raceRunners %}
+                                        <tr>
+                                            <td>{{ runner.startNumber }}</td>
+                                            <td>{{ runner.runner.name }}</td>
+                                            <td>{{ runner.runner.surname }}</td>
+                                            <td>
+                                                {% if runner.runner.gender == 1 %}
+                                                    kobieta
+                                                {% else %}
+                                                    mężczyzna
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ runner.runner.club }}</td>
+                                            <td>{{ runner.runner.birthDate | date("Y") }}</td>
+                                            <td>{{ runner.categories | join(',') }}</td>
+                                            <td>{{ runner.finishPlace }}</td>
+                                            <td>{{ runner.prettyTime }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <div>
+                                    <h4>
+                                        Nikt się jeszcze nie zapisał na ten bieg, bądź pierwszy!
+                                        {% if race.canSign(app.user) %}<button type="button" class="btn btn-xs btn-success" data-toggle="modal" data-target="#sign-for-race">Zapisz się!</button>{% endif %}
+                                    </h4>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <!-- /.tab-pane -->
+                    </div>
+                    <!-- /.tab-content -->
+                </div>
+                <!-- /.nav-tabs-custom -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </section>
+    <div class="modal fade in" id="sign-for-race">
+        {{ form_start(form, {'action': path('sign_for_race', {'id': race.id}) }) }}
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">Zapisz się na bieg</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="padding-left: 25px;">
+                        {{ form_row(form, {'label': 'Wybierz kategorię'}) }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Zapisz się!</button>
+                </div>
+            </div>
+        </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script src="http://maps.google.com/maps/api/js?key=AIzaSyDVaGUTL1zg51-uT-Csnu-zafTAjR4xJOo" type="text/javascript"></script>
+    <script>
+        $(document).ready(function() {
+            $('#example').DataTable( {
+                "language": {
+                    "url": "/template/plugins/datatables/Polish.json"
+                }
+            } );
+            $(".show-link-for-localizators").click(function () {
+                $(this).next(".link-for-localizators").removeClass('hidden');
+                $(this).hide();
+            });
+        } );
+    </script>
+    <script>
+        var adress = "{{ race.contest.adress }}";
+        var map;
+        var markers = [];
+        var route;
+
+        function renderRoute(){
+            if(!map){
+                var geokoder = new google.maps.Geocoder();
+                geokoder.geocode({address: adress}, geocodingAction);
+            }
+        }
+
+        function geocodingAction(res, status)
+        {
+            if(status === google.maps.GeocoderStatus.OK){
+                mapStart(res[0].geometry.location);
+            }else {
+                console.log("nie mogę zlokalizować tego adresu:(");
+            }
+        }
+
+
+        function mapStart(cords_from_address)
+        {
+            var center_cords = markers.length > 0
+                                ? markers[0].getPosition()
+                                : cords_from_address;
+
+            var map_options = {
+                zoom: 15,
+                center: center_cords,
+                disableDefaultUI: true
+            };
+
+            map = new google.maps.Map(document.getElementById("map"), map_options);
+
+            route = new google.maps.Polyline({
+                map: 			map,
+                path: 			getCordsFromMarkers(),
+                strokeColor:	'#ff0000',
+                strokeWeight:	3,
+                editable: false
+            });
+
+            {% for cords in race.track.trackElems[0].points %}
+                addMarker({lat: {{ cords.lat }}, lng: {{ cords.lng }} });
+            {% endfor %}
+        }
+
+        function addMarker(latlng)
+        {
+            var icon_url = markers.length === 0 ? '{{ asset('img/flag_icon.ico') }}' : '{{ asset('img/finish_flag_icon.ico') }}';
+
+            var marker = new google.maps.Marker({
+                position: latlng,
+                map: map,
+                icon: {
+                    url: icon_url,
+                    size: new google.maps.Size(30, 30),
+                    origin: new google.maps.Point(0, 0),
+                    anchor: new google.maps.Point(0, 30),
+                    scaledSize: new google.maps.Size(30, 30)
+                }
+            });
+
+            markers.push(marker);
+            drawRoute();
+            updateMarkersIcons();
+
+            var bounds = new google.maps.LatLngBounds();
+            for (var i = 0; i < markers.length; i++) {
+                bounds.extend(markers[i].getPosition());
+            }
+            map.fitBounds(bounds);
+        }
+
+        function drawRoute(){
+            route.setPath(getCordsFromMarkers());
+        }
+
+        function getCordsFromMarkers(){
+            return markers.map(getCordsFromMarker);
+        }
+
+        function getCordsFromMarker(item){
+            return {lat: item.getPosition().lat(), lng: item.getPosition().lng()};
+        }
+
+        function updateMarkersIcons(){
+            for(var i = 0; i < markers.length; i++){
+                var icon_url = i === 0
+                    ? '{{ asset('img/flag_icon.ico') }}'
+                    : i === markers.length -1
+                        ? '{{ asset('img/finish_flag_icon.ico') }}'
+                        : '{{ asset('img/blue_flag_icon.ico') }}';
+
+                var icon = {
+                    url: icon_url,
+                    size: new google.maps.Size(30, 30),
+                    origin: new google.maps.Point(0, 0),
+                    anchor: new google.maps.Point(0, 30),
+                    scaledSize: new google.maps.Size(30, 30)
+                };
+
+                markers[i].setIcon(icon);
+            }
+        }
+    </script>
+{% endblock %}
+{% block stylesheet %}
+    <link rel="stylesheet" href="/template/plugins/datatables/dataTables.bootstrap.css">
+{% endblock %}

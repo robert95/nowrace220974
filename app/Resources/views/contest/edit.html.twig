@@ -1,0 +1,98 @@
+{% extends(":contest:add.html.twig") %}
+{% block main %}
+    {% set pageName = "Moje zawody - edycja zawodów" %}
+    {% set pageHeader = "Edycja zawodów" %}
+    {% set submitBtn = "Edytuj zawody" %}
+    {{ parent() }}
+{% endblock %}
+{% block rightSide %}
+    {% if contest.races | length > 0 %}
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">
+                    Wyścigi na zawodach
+                    <a href="{{ path('race_add', {'id': contest.id}) }}" type="button" class="pull-right btn btn-primary btn-sm">+ Dodaj nowy wyścig</a>
+                </h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <table id="example" class="table table-striped table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Start</th>
+                            <th>Dystans</th>
+                            <th>Zawodnicy</th>
+                            <th>Akcje</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Start</th>
+                            <th>Dystans</th>
+                            <th>Zawodnicy</th>
+                            <th>Akcje</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                    {% for race in contest.races %}
+                        <tr>
+                            <td>{{ race.startTime | date("d/m/Y H:i") }}</td>
+                            <td>{{ race.distance }}</td>
+                            <td>{{ race.raceRunners | length }} / {{ race.maxRunners }}</td>
+                            <td>
+                                <a href="{{ path('race_show', {'id': race.id} ) }}">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </a>
+                                {% if date(race.startTime) > date() %}
+                                    <a href="{{ path('race_edit', {'id': race.id} ) }}">
+                                        <i class="fa fa-edit" aria-hidden="true"></i>
+                                    </a>
+                                    <a href="{{ path('race_delete', {'id': race.id} ) }}">
+                                        <i class="fa fa-remove" aria-hidden="true"></i>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    {% else %}
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">
+                    Wyścigi na zawodach
+                </h3>
+            </div>
+            <div class="box-body">
+                <h4>Nie dodałeś jeszcze wyścigów dla tych zawodów, zrób to teraz!</h4>
+                <p>
+                    <a href="{{ path('race_add', {'id': contest.id}) }}" type="button" class="btn btn-success btn-flat btn-lg">+ Dodaj pierwszy wyścig</a>
+                </p>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+{% block scripts %}
+    <script>
+        $(document).ready(function() {
+            $('#example').DataTable( {
+                "language": {
+                    "url": "/template/plugins/datatables/Polish.json"
+                },
+                "columnDefs": [
+                    {
+                        "targets": [ 3 ],
+                        "orderable": false,
+                        "searchable": false
+                    }
+                ]
+            } );
+        } );
+    </script>
+{% endblock %}
+{% block stylesheet %}
+    <link rel="stylesheet" href="/template/plugins/datatables/dataTables.bootstrap.css">
+{% endblock %}
