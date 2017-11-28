@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Company;
+use AppBundle\Entity\RaceRunner;
 use AppBundle\Entity\Runner;
 use AppBundle\Entity\User;
 use AppBundle\Form\Security\CompanyType;
@@ -14,6 +15,8 @@ use AppBundle\Form\Security\UserType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -283,5 +286,66 @@ class SecurityController extends Controller
         $request = $this->get("request_stack");
         $event = new InteractiveLoginEvent($request->getCurrentRequest(), $token);
         $this->get("event_dispatcher")->dispatch("security.interactive_login", $event);
+    }
+
+    /**
+     * @Route("/app-login", name="app-login")
+     */
+    public function appLoginAction(Request $request)
+    {
+        $response = new Response();
+        $login = $request->query->get('l');
+        $pass = $request->query->get('p');
+
+        $em = $this->get('doctrine.orm.entity_manager');
+        $user = $em->getRepository(User::class)->findOneByEmail($login);
+
+        if(!$user){
+            $response->setContent(json_encode([
+                'error' => 'Błędne dane'
+            ]));
+        }else{
+
+            $factory = $this->get('security.encoder_factory');
+            $encoder = $factory->getEncoder($user);
+            $bool = $encoder->isPasswordValid($user->getPassword(),$pass,$user->getSalt());
+
+            if($bool && $user->getRunner() != null){
+                $raceRunners = $em->getRepository(RaceRunner::class)
+                    ->createQueryBuilder('rr')
+                    ->join('rr.race','r')
+                    ->where('rr.runner = :runner')
+                    ->setParameter('runner', $user->getRunner())
+                    ->andWhere('rr.endTime IS NULL')
+                    ->orderBy('r.startTime', 'ASC')
+                    ->setMaxResults(1)
+                    ->getQuery()
+                    ->getResult();
+
+                if(count($raceRunners) > 0){
+                    $raceRunner = $raceRunners[0];
+                    $race = $raceRunner->getRace();
+                    $kcy = $this->get('hashids');
+                    $response->setContent(json_encode([
+                        'name' => $race->getName(),
+                        'date' => $race->getStartTime()->format("H:i d-m-Y"),
+                        'timestamp' => $race->getStartTime()->getTimestamp(),
+                        'url' => $this->generateUrl('race_set_cords', array('hashid' => $kcy->encode($raceRunner->getId())), UrlGeneratorInterface::ABSOLUTE_URL),
+                    ]));
+                }else{
+                    $response->setContent(json_encode([
+                        'error' => 'Nie masz aktywnych wyścigów'
+                    ]));
+                }
+            }else{
+                $response->setContent(json_encode([
+                    'error' => 'Błędne dane'
+                ]));
+            }
+        }
+
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        return $response;
     }
 }
